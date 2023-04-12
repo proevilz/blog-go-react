@@ -11,7 +11,14 @@ type UserController struct{}
 
 func (u *UserController) AllUsers(c *fiber.Ctx) error {
 	UserRepositry := &repositories.UserRepositry{}
-	users, err := UserRepositry.GetAllUsers()
+	includePosts := c.Query("includePosts") == "true"
+	var users interface{}
+	var err error
+	if includePosts {
+		users, err = UserRepositry.GetAllUsersWithPosts()
+	} else {
+		users, err = UserRepositry.GetAllUsers()
+	}
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"message": "Error getting users",

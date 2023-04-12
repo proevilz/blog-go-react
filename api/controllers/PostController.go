@@ -10,9 +10,16 @@ import (
 type PostController struct{}
 
 func (p *PostController) AllPosts(c *fiber.Ctx) error {
-	PostRepositry := &repositories.PostRepositry{}
+	PostRepositry := &repositories.PostRepository{}
 	includeUsers := c.Query("includeUsers") == "true"
-	posts, err := PostRepositry.AllPosts(includeUsers)
+	var posts interface{}
+	var err error
+	if includeUsers {
+		posts, err = PostRepositry.AllPostsWithUsers()
+	} else {
+		posts, err = PostRepositry.AllPosts()
+	}
+
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"message": "Error getting posts",
@@ -25,7 +32,7 @@ func (p *PostController) AllPosts(c *fiber.Ctx) error {
 }
 
 func (p *PostController) AddPost(c *fiber.Ctx) error {
-	PostRepositry := &repositories.PostRepositry{}
+	PostRepositry := &repositories.PostRepository{}
 	post := new(models.Post)
 	err := c.BodyParser(post)
 	if err != nil {
@@ -44,8 +51,15 @@ func (p *PostController) AddPost(c *fiber.Ctx) error {
 }
 
 func (p *PostController) GetPost(c *fiber.Ctx) error {
-	PostRepositry := &repositories.PostRepositry{}
-	post, err := PostRepositry.GetPost(c.Params("id"))
+	PostRepositry := &repositories.PostRepository{}
+	includeUser := c.Query("includeUser") == "true"
+	var post interface{}
+	var err error
+	if includeUser {
+		post, err = PostRepositry.GetPostWithUser(c.Params("id"))
+	} else {
+		post, err = PostRepositry.GetPost(c.Params("id"))
+	}
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"message": "Error getting post",

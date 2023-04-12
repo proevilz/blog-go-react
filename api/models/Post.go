@@ -10,5 +10,5 @@ type Post struct {
 	CoverImage string `json:"cover_image"`
 	ReadTime   int    `json:"read_time"`
 	UserID     uint   `json:"user_id"`
-	User       User   `json:"user"`
+	User       *User  `json:"user,omitempty"`
 }

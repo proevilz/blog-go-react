@@ -18,7 +18,16 @@ func (ur *UserRepositry) GetAllUsers() ([]models.User, error) {
 
 	return users, nil
 }
+func (ur *UserRepositry) GetAllUsersWithPosts() ([]models.User, error) {
+	var users []models.User
 
+	err := database.DB.Preload("Posts").Find(&users).Error
+	if err != nil {
+		return []models.User{}, err
+	}
+
+	return users, nil
+}
 func (ur *UserRepositry) AddUser(user *models.User) (*models.User, error) {
 
 	result := database.DB.Create(user)

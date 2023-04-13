@@ -5,9 +5,9 @@ import (
 	"proevilz/blog-api/models"
 )
 
-type UserRepositry struct{}
+type UserRepository struct{}
 
-func (ur *UserRepositry) GetAllUsers() ([]models.User, error) {
+func (ur *UserRepository) GetAllUsers() ([]models.User, error) {
 	var users []models.User
 
 	result := database.DB.Find(&users)
@@ -18,7 +18,7 @@ func (ur *UserRepositry) GetAllUsers() ([]models.User, error) {
 
 	return users, nil
 }
-func (ur *UserRepositry) GetAllUsersWithPosts() ([]models.User, error) {
+func (ur *UserRepository) GetAllUsersWithPosts() ([]models.User, error) {
 	var users []models.User
 
 	err := database.DB.Preload("Posts").Find(&users).Error
@@ -28,7 +28,7 @@ func (ur *UserRepositry) GetAllUsersWithPosts() ([]models.User, error) {
 
 	return users, nil
 }
-func (ur *UserRepositry) AddUser(user *models.User) (*models.User, error) {
+func (ur *UserRepository) AddUser(user *models.User) (*models.User, error) {
 
 	result := database.DB.Create(user)
 	if result.Error != nil {
@@ -36,4 +36,15 @@ func (ur *UserRepositry) AddUser(user *models.User) (*models.User, error) {
 	}
 
 	return user, nil
+}
+
+func (ur *UserRepository) GetUserByEmail(email string) (*models.User, error) {
+	var user models.User
+
+	result := database.DB.Where("email = ?", email).First(&user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return &user, nil
 }

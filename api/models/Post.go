@@ -1,14 +1,21 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Post struct {
-	gorm.Model
-
-	Title      string `json:"title"`
-	Content    string `json:"content"`
-	CoverImage string `json:"cover_image"`
-	ReadTime   int    `json:"read_time"`
-	UserID     uint   `json:"user_id"`
-	User       *User  `json:"user,omitempty"`
+	ID         uint           `gorm:"primarykey" json:"id"`
+	CreatedAt  time.Time      `json:"createdAt"`
+	UpdatedAt  time.Time      `json:"updatedAt"`
+	DeletedAt  gorm.DeletedAt `gorm:"index" json:"deletedAt,omitempty"`
+	Title      string         `json:"title"`
+	Content    string         `json:"content"`
+	CoverImage string         `json:"coverImage"`
+	ReadTime   int            `json:"readTime"`
+	UserID     uint           `json:"userId"`
+	User       *User          `json:"user,omitempty"`
+	Tags       []*Tags        `gorm:"many2many:post_tags;" json:"tags,omitempty"`
 }

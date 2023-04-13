@@ -1,0 +1,9 @@
+.registerInputWrapper {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+}
+
+.registerInputWrapper .mantine-InputWrapper-root {
+    flex: 1;
+}

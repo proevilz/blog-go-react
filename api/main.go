@@ -1,24 +1,24 @@
 package main
 
 import (
-	"proevilz/blog-api/controllers"
 	"proevilz/blog-api/database"
+	"proevilz/blog-api/router"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 func main() {
 	database.ConnectDB()
 
 	app := fiber.New()
-	userController := &controllers.UserController{}
-	postController := &controllers.PostController{}
 
-	app.Get("/api/v1/users", userController.AllUsers)
-	app.Post("/api/v1/users", userController.AddUser)
+	app.Use(cors.New())
+	app.Use(logger.New(logger.Config{
 
-	app.Get("/api/v1/posts", postController.AllPosts)
-	app.Get("/api/v1/posts/:id", postController.GetPost)
-	app.Post("/api/v1/posts", postController.AddPost)
+		Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}​\n",
+	}))
+	router.SetupRouter(app)
 	app.Listen(":3000")
 }

@@ -1,15 +1,11 @@
 import {
     ColorScheme,
     ColorSchemeProvider,
-    Container,
-    Grid,
     MantineProvider,
-    Stack,
 } from '@mantine/core'
 import { useHotkeys, useLocalStorage } from '@mantine/hooks'
 import Navbar from './Navbar'
-import PostCard from '../PostCard'
-import { Outlet } from 'react-router-dom'
+import { NavigationProgress } from '@mantine/nprogress'
 
 interface LayoutProps {
     children?: React.ReactNode | React.ReactNode[]
@@ -32,10 +28,20 @@ const Layout = ({ children }: LayoutProps) => {
             toggleColorScheme={toggleColorScheme}
         >
             <MantineProvider
-                theme={{ colorScheme }}
-                withGlobalStyles
+                theme={{
+                    colorScheme,
+                    globalStyles: (theme) => ({
+                        body: {
+                            backgroundColor:
+                                theme.colorScheme === 'dark'
+                                    ? theme.colors.dark[7]
+                                    : theme.colors.gray[1],
+                        },
+                    }),
+                }}
                 withNormalizeCSS
             >
+                <NavigationProgress />
                 <Navbar />
                 <>{children}</>
             </MantineProvider>

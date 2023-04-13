@@ -6,8 +6,11 @@ import {
     Group,
     TextInput,
     Button,
+    Anchor,
 } from '@mantine/core'
 import { IconSearch } from '@tabler/icons-react'
+import { memo } from 'react'
+import { Link } from 'react-router-dom'
 
 const Navbar = () => {
     return (
@@ -15,7 +18,9 @@ const Navbar = () => {
             <Container size='lg'>
                 <Flex justify='space-between'>
                     <Group>
-                        <Image height={40} width={40} src='/logo.svg' />
+                        <Anchor component={Link} to={'/'}>
+                            <img height={40} width={40} src='/logo.svg' />
+                        </Anchor>
                         <TextInput
                             placeholder='Search'
                             w={300}
@@ -23,8 +28,20 @@ const Navbar = () => {
                         />
                     </Group>
                     <Group>
-                        <Button variant='subtle'>Login</Button>
-                        <Button variant='outline'>Create account</Button>
+                        <Button
+                            variant='subtle'
+                            component={Link}
+                            to={'/auth/login'}
+                        >
+                            Login
+                        </Button>
+                        <Button
+                            variant='outline'
+                            component={Link}
+                            to={'/auth/register'}
+                        >
+                            Create account
+                        </Button>
                     </Group>
                 </Flex>
             </Container>
@@ -32,4 +49,4 @@ const Navbar = () => {
     )
 }
 
-export default Navbar
+export default memo(Navbar)

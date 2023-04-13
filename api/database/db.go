@@ -6,6 +6,7 @@ import (
 	"proevilz/blog-api/models"
 
 	"github.com/joho/godotenv"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -36,7 +37,7 @@ func ConnectDB() {
 	if err != nil {
 		log.Println("failed to connect database")
 	}
-	db.AutoMigrate(&models.User{})
-	db.AutoMigrate(&models.Post{})
+	db.AutoMigrate(&models.User{}, &models.Post{}, &models.Reactions{})
+
 	DB = db
 }

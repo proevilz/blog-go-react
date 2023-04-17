@@ -6,6 +6,7 @@ import {
 import { useHotkeys, useLocalStorage } from '@mantine/hooks'
 import Navbar from './Navbar'
 import { NavigationProgress } from '@mantine/nprogress'
+import { Notifications } from '@mantine/notifications'
 
 interface LayoutProps {
     children?: React.ReactNode | React.ReactNode[]

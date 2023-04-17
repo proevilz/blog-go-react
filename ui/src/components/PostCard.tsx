@@ -13,12 +13,17 @@ import { IconMessageCircle } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
 
 const PostCard = ({ post }: { post: PostWithUsers }) => {
-    const href = `${post.user.username}/posts/${toSlug(post.title)}`
+    const href = `/post/${toSlug(post.title)}`
     return (
         <Paper withBorder radius='md' sx={{ overflow: 'hidden' }}>
             {post.coverImage !== null && (
                 <Anchor href={href}>
-                    <Image src={post.coverImage} height={200} />
+                    <Image
+                        src={`${import.meta.env.VITE_API_URL}/media/${
+                            post.coverImage
+                        }`}
+                        height={200}
+                    />
                 </Anchor>
             )}
             <Container pt='sm'>

@@ -31,6 +31,7 @@ func (ur *UserRepository) GetAllUsersWithPosts() ([]models.User, error) {
 func (ur *UserRepository) AddUser(user *models.User) (*models.User, error) {
 
 	result := database.DB.Create(user)
+
 	if result.Error != nil {
 		return nil, result.Error
 	}

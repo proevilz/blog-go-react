@@ -11,25 +11,24 @@ import {
 } from '@mantine/core'
 import Layout from '../../components/Layout/Layout'
 import { useForm } from '@mantine/form'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { loginFormConfig } from './validators'
+import { useMutation } from '@tanstack/react-query'
+import { doLogin } from '../../api'
+import { useContext } from 'react'
+import { AuthContext } from '../../context/AuthContext'
 
 const Login = () => {
-    const form = useForm({
-        initialValues: {
-            email: '',
-            password: '',
-        },
-
-        validate: {
-            email: (value) => {
-                return /^\S+@\S+$/.test(value.trim()) ? null : 'Invalid email'
-            },
-            password: (value) => {
-                return value.trim().length === 0 && 'Password is required'
-            },
+    const { setUser } = useContext(AuthContext)
+    const navigate = useNavigate()
+    const form = useForm(loginFormConfig)
+    const mutation = useMutation(doLogin, {
+        onSuccess: (data) => {
+            console.log(data)
+            setUser(data.user)
+            navigate('/dashboard')
         },
     })
-
     return (
         <Layout>
             <Container size='sm'>
@@ -39,9 +38,9 @@ const Login = () => {
                     </Center>
                     <Stack p='md'>
                         <form
-                            onSubmit={form.onSubmit((values) =>
-                                console.log(values)
-                            )}
+                            onSubmit={form.onSubmit((values) => {
+                                mutation.mutate(values)
+                            })}
                         >
                             <TextInput
                                 mb='sm'

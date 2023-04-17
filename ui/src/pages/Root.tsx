@@ -8,7 +8,6 @@ import {
     Button,
     Flex,
     Anchor,
-    Box,
     Divider,
     Center,
 } from '@mantine/core'
@@ -18,13 +17,15 @@ import Layout from '../components/Layout/Layout'
 import { useQuery } from '@tanstack/react-query'
 import { getAllPostsWithUsers } from '../api'
 import { Link } from 'react-router-dom'
+import { AuthContext } from '../context/AuthContext'
+import { useContext } from 'react'
 
 const Root = () => {
-    const { data, isLoading, isError, error } = useQuery({
+    const { data, isLoading } = useQuery({
         queryKey: ['posts'],
         queryFn: getAllPostsWithUsers,
     })
-
+    const { user } = useContext(AuthContext)
     return (
         <Layout>
             <Container size='lg'>
@@ -39,22 +40,24 @@ const Root = () => {
                                 We're a place where coders share, stay
                                 up-to-date and grow their careers.
                             </Text>
-                            <Stack mt='md'>
-                                <Button
-                                    variant='outline'
-                                    component={Link}
-                                    to={'/auth/register'}
-                                >
-                                    Create account
-                                </Button>
-                                <Button
-                                    variant='subtle'
-                                    component={Link}
-                                    to={'/auth/login'}
-                                >
-                                    Login
-                                </Button>
-                            </Stack>
+                            {user === null && (
+                                <Stack mt='md'>
+                                    <Button
+                                        variant='outline'
+                                        component={Link}
+                                        to={'/auth/register'}
+                                    >
+                                        Create account
+                                    </Button>
+                                    <Button
+                                        variant='subtle'
+                                        component={Link}
+                                        to={'/auth/login'}
+                                    >
+                                        Login
+                                    </Button>
+                                </Stack>
+                            )}
                         </Paper>
                     </Grid.Col>
                     <Grid.Col span={7}>
@@ -66,6 +69,16 @@ const Root = () => {
                                     <Skeleton height={250} />
                                     <Skeleton height={250} />
                                 </Stack>
+                            ) : data.length === 0 ? (
+                                <Paper withBorder p='lg'>
+                                    <Text
+                                        align='center'
+                                        size='xl'
+                                        color='dimmed'
+                                    >
+                                        No posts yet, but there will be soon!
+                                    </Text>
+                                </Paper>
                             ) : (
                                 data.map((post: PostWithUsers) => (
                                     <PostCard key={post.id} post={post} />

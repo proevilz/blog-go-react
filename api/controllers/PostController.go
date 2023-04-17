@@ -1,23 +1,29 @@
 package controllers
 
 import (
+	"fmt"
+	"log"
+	"net/http"
+	"os"
 	"proevilz/blog-api/models"
 	"proevilz/blog-api/repositories"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 type PostController struct{}
 
 func (p *PostController) AllPosts(c *fiber.Ctx) error {
-	PostRepositry := &repositories.PostRepository{}
+	PostRepository := &repositories.PostRepository{}
 	includeUsers := c.Query("includeUsers") == "true"
 	var posts interface{}
 	var err error
 	if includeUsers {
-		posts, err = PostRepositry.AllPostsWithUsers()
+		posts, err = PostRepository.AllPostsWithUsers()
 	} else {
-		posts, err = PostRepositry.AllPosts()
+		posts, err = PostRepository.AllPosts()
 	}
 
 	if err != nil {
@@ -32,13 +38,35 @@ func (p *PostController) AllPosts(c *fiber.Ctx) error {
 }
 
 func (p *PostController) AddPost(c *fiber.Ctx) error {
-	PostRepositry := &repositories.PostRepository{}
+	PostRepository := &repositories.PostRepository{}
 	post := new(models.Post)
 	err := c.BodyParser(post)
 	if err != nil {
 		return err
 	}
-	post, err = PostRepositry.AddPost(post)
+	file, _ := c.FormFile("coverImageFile")
+	//TODO: go routine to optimise file size and save image
+	if file != nil {
+		if file.Size > 5*1024*1024 {
+			return c.SendStatus(http.StatusRequestEntityTooLarge)
+		}
+		dir, err := os.Getwd()
+		if err != nil {
+			log.Fatal(err)
+		}
+		rawFileName := strings.Split(file.Filename, ".")
+		ext := rawFileName[len(rawFileName)-1]
+		fileName := uuid.New().String() + "." + ext
+		err = c.SaveFile(file, fmt.Sprintf("%s/static/uploads/%s", dir, fileName))
+		if err != nil {
+			log.Println("Error saving file:", err)
+			return err
+		}
+
+		post.CoverImage = fileName
+	}
+
+	post, err = PostRepository.AddPost(post)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"message": "Error adding post",
@@ -51,14 +79,23 @@ func (p *PostController) AddPost(c *fiber.Ctx) error {
 }
 
 func (p *PostController) GetPost(c *fiber.Ctx) error {
-	PostRepositry := &repositories.PostRepository{}
+	PostRepository := &repositories.PostRepository{}
 	includeUser := c.Query("includeUser") == "true"
+	slug := c.Params("slug")
 	var post interface{}
 	var err error
 	if includeUser {
-		post, err = PostRepositry.GetPostWithUser(c.Params("id"))
+		if slug != "" {
+			post, err = PostRepository.GetPostWithUserBySlug(slug)
+		} else {
+			post, err = PostRepository.GetPostWithUser(c.Params("id"))
+		}
 	} else {
-		post, err = PostRepositry.GetPost(c.Params("id"))
+		if slug != "" {
+			post, err = PostRepository.GetPostBySlug(slug)
+		} else {
+			post, err = PostRepository.GetPost(c.Params("id"))
+		}
 	}
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{

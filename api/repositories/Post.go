@@ -8,14 +8,59 @@ import (
 
 type PostRepository struct{}
 type PostResponse struct {
-	ID         uint      `json:"id"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
-	Title      string    `json:"title"`
-	Content    string    `json:"content"`
-	CoverImage string    `json:"cover_image"`
-	ReadTime   int       `json:"read_time"`
-	UserID     uint      `json:"user_id"`
+	ID         uint            `json:"id"`
+	CreatedAt  time.Time       `json:"createdAt"`
+	UpdatedAt  time.Time       `json:"updatedAt"`
+	Title      string          `json:"title"`
+	Slug       string          `json:"slug"`
+	Content    string          `json:"content"`
+	CoverImage string          `json:"coverImage"`
+	ReadTime   int             `json:"readTime"`
+	User       UserWithoutPass `json:"user"`
+}
+
+type UserWithoutPass struct {
+	ID        uint      `json:"id"`
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	Username  string    `json:"username"`
+	Email     string    `json:"email"`
+}
+
+type PostResponseWithUser struct {
+	ID         uint            `json:"id"`
+	CreatedAt  time.Time       `json:"createdAt"`
+	UpdatedAt  time.Time       `json:"updatedAt"`
+	Title      string          `json:"title"`
+	Slug       string          `json:"slug"`
+	Content    string          `json:"content"`
+	CoverImage string          `json:"coverImage"`
+	ReadTime   int             `json:"readTime"`
+	User       UserWithoutPass `json:"user"`
+}
+
+func PostsToPostResponsesSafeUser(posts []models.Post) []PostResponseWithUser {
+	postResponses := make([]PostResponseWithUser, len(posts))
+	for i, post := range posts {
+		postResponses[i] = PostResponseWithUser{
+			ID:         post.ID,
+			CreatedAt:  post.CreatedAt,
+			UpdatedAt:  post.UpdatedAt,
+			Title:      post.Title,
+			Slug:       post.Slug,
+			Content:    post.Content,
+			CoverImage: post.CoverImage,
+			ReadTime:   post.ReadTime,
+			User: UserWithoutPass{
+				ID:        post.User.ID,
+				CreatedAt: post.User.CreatedAt,
+				UpdatedAt: post.User.UpdatedAt,
+				Username:  post.User.Username,
+				Email:     post.User.Email,
+			},
+		}
+	}
+	return postResponses
 }
 
 func PostsToPostResponses(posts []models.Post) []PostResponse {
@@ -26,27 +71,27 @@ func PostsToPostResponses(posts []models.Post) []PostResponse {
 			CreatedAt:  post.CreatedAt,
 			UpdatedAt:  post.UpdatedAt,
 			Title:      post.Title,
+			Slug:       post.Slug,
 			Content:    post.Content,
 			CoverImage: post.CoverImage,
 			ReadTime:   post.ReadTime,
-			UserID:     post.UserID,
 		}
 	}
 	return postResponses
 }
 
-func (pr *PostRepository) AllPostsWithUsers() ([]models.Post, error) {
+func (pr *PostRepository) AllPostsWithUsers() ([]PostResponseWithUser, error) {
 	var posts []models.Post
-	result := database.DB.Preload("User").Find(&posts)
+	result := database.DB.Order("created_at DESC").Preload("User").Find(&posts)
 	if result.Error != nil {
-		return []models.Post{}, result.Error
+		return []PostResponseWithUser{}, result.Error
 	}
 
-	return posts, nil
+	return PostsToPostResponsesSafeUser(posts), nil
 }
 func (pr *PostRepository) AllPosts() ([]PostResponse, error) {
 	var posts []models.Post
-	result := database.DB.Find(&posts)
+	result := database.DB.Order("created_at DESC").Find(&posts)
 	if result.Error != nil {
 		return []PostResponse{}, result.Error
 	}
@@ -54,6 +99,7 @@ func (pr *PostRepository) AllPosts() ([]PostResponse, error) {
 	return PostsToPostResponses(posts), nil
 }
 func (pr *PostRepository) AddPost(post *models.Post) (*models.Post, error) {
+	post.UserID = 1
 	result := database.DB.Create(post)
 	if result.Error != nil {
 		return nil, result.Error
@@ -79,5 +125,23 @@ func (pr *PostRepository) GetPostWithUser(id string) (*models.Post, error) {
 		return nil, result.Error
 	}
 
+	return &post, nil
+}
+
+func (pr *PostRepository) GetPostBySlug(slug string) (*models.Post, error) {
+	var post models.Post
+	result := database.DB.Where("slug = ?", slug).First(&post)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &post, nil
+}
+
+func (pr *PostRepository) GetPostWithUserBySlug(slug string) (*models.Post, error) {
+	var post models.Post
+	result := database.DB.Preload("User").Where("slug = ?", slug).First(&post)
+	if result.Error != nil {
+		return nil, result.Error
+	}
 	return &post, nil
 }

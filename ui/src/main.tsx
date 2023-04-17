@@ -1,4 +1,3 @@
-import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Root from './pages/Root'
@@ -8,10 +7,20 @@ import Register from './pages/auth/Register'
 import AuthRedirect from './components/AuthRedirect'
 const queryClient = new QueryClient()
 import './index.css'
+import AuthState from './context/AuthContext'
+import Dashboard from './pages/dashboard/Dashboard'
+import Write from './pages/dashboard/Write'
+import Logout from './pages/auth/Logout'
+import Post from './pages/Post'
 const router = createBrowserRouter([
     {
         path: '/',
         element: <Root />,
+        loader: () => <p>Loading...</p>,
+    },
+    {
+        path: '/post/:slug',
+        element: <Post />,
         loader: () => <p>Loading...</p>,
     },
     {
@@ -31,10 +40,27 @@ const router = createBrowserRouter([
             },
         ],
     },
+    {
+        path: '/logout',
+        element: <Logout />,
+        loader: () => <p>Loading...</p>,
+    },
+    {
+        path: '/dashboard',
+        element: <Dashboard />,
+        loader: () => <p>Loading...</p>,
+    },
+    {
+        path: '/dashboard/write',
+        element: <Write />,
+        loader: () => <p>Loading...</p>,
+    },
 ])
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-    <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-    </QueryClientProvider>
+    <AuthState>
+        <QueryClientProvider client={queryClient}>
+            <RouterProvider router={router} />
+        </QueryClientProvider>
+    </AuthState>
 )

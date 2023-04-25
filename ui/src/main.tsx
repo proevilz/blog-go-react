@@ -12,6 +12,11 @@ import Dashboard from './pages/dashboard/Dashboard'
 import Write from './pages/dashboard/Write'
 import Logout from './pages/auth/Logout'
 import Post from './pages/Post'
+import Settings from './pages/dashboard/settings/Settings'
+import Customisation from './pages/dashboard/settings/Customisation'
+import Notifications from './pages/dashboard/settings/Notifications'
+import Account from './pages/dashboard/settings/Account'
+import Billing from './pages/dashboard/settings/Billing'
 const router = createBrowserRouter([
     {
         path: '/',
@@ -54,6 +59,29 @@ const router = createBrowserRouter([
         path: '/dashboard/write',
         element: <Write />,
         loader: () => <p>Loading...</p>,
+    },
+    {
+        path: '/dashboard/settings',
+        element: <Settings />,
+        loader: () => <p>Loading...</p>,
+        children: [
+            {
+                path: '/dashboard/settings/customisation',
+                element: <Customisation />,
+            },
+            {
+                path: '/dashboard/settings/notifications',
+                element: <Notifications />,
+            },
+            {
+                path: '/dashboard/settings/account',
+                element: <Account />,
+            },
+            {
+                path: '/dashboard/settings/billing',
+                element: <Billing />,
+            },
+        ],
     },
 ])
 

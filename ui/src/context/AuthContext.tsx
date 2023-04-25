@@ -1,5 +1,6 @@
 import { useLocalStorage } from '@mantine/hooks'
 import { ReactNode, createContext, useEffect, useState } from 'react'
+import { checkTokenExpiration } from '../utils'
 
 interface AuthContext {
     user: null | User
@@ -12,7 +13,7 @@ const AuthState = ({ children }: { children: ReactNode | ReactNode[] }) => {
         key: 'user',
         defaultValue: null,
     })
-
+    checkTokenExpiration()
     return (
         <AuthContext.Provider
             value={{

@@ -49,3 +49,31 @@ func (ur *UserRepository) GetUserByEmail(email string) (*models.User, error) {
 
 	return &user, nil
 }
+func (ur *UserRepository) GetSettings(UserID uint) (*models.Settings, error) {
+	settings := &models.Settings{UserId: UserID}
+
+	result := database.DB.Where("user_id = ?", UserID).FirstOrCreate(settings)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return settings, nil
+}
+
+func (ur *UserRepository) UpdateSettings(UserID uint, settings *models.Settings) (*models.Settings, error) {
+	updatedSettings := &models.Settings{}
+	result := database.DB.Model(updatedSettings).Where("user_id = ?", UserID).Updates(settings)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	result = database.DB.Where("user_id = ?", UserID).First(updatedSettings)
+
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return updatedSettings, nil
+}

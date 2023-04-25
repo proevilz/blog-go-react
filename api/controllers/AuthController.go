@@ -48,11 +48,14 @@ func (a *AuthController) Login(c *fiber.Ctx) error {
 	cookie := new(fiber.Cookie)
 	cookie.Name = "jwt"
 	cookie.Value = token
-	cookie.Expires = time.Now().Add(10 * time.Minute)
+	cookie.Expires = time.Now().Add(30 * time.Minute)
 	cookie.HTTPOnly = true
 	cookie.Domain = os.Getenv("APP_DOMAIN")
+	cookie.SameSite = "None"
+	cookie.Secure = true
 
 	c.Cookie(cookie)
+
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"user": storedUser.ToUserResponse(),
 	})

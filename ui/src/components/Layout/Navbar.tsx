@@ -85,7 +85,11 @@ const Navbar = () => {
                                     >
                                         Dashboard
                                     </Menu.Item>
-                                    <Menu.Item icon={<IconPencil size={14} />}>
+                                    <Menu.Item
+                                        icon={<IconPencil size={14} />}
+                                        to={'/dashboard/write'}
+                                        component={Link}
+                                    >
                                         Create post
                                     </Menu.Item>
 
@@ -94,6 +98,8 @@ const Navbar = () => {
                                     </Menu.Item>
                                     <Menu.Item
                                         icon={<IconSettings size={14} />}
+                                        to={'/dashboard/settings'}
+                                        component={Link}
                                     >
                                         Settings
                                     </Menu.Item>

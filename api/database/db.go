@@ -37,7 +37,7 @@ func ConnectDB() {
 	if err != nil {
 		log.Println("failed to connect database")
 	}
-	db.AutoMigrate(&models.User{}, &models.Post{}, &models.Reactions{})
+	db.AutoMigrate(&models.User{}, &models.Post{}, &models.Reactions{}, &models.Settings{})
 
 	DB = db
 }

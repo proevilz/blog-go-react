@@ -31,3 +31,27 @@ export const toSlug = (str: string) => {
         .replace(/ /g, '-')
         .replace(/[^\w-]+/g, '')
 }
+
+export const checkTokenExpiration = () => {
+    const removeAndRedirect = () => {
+        localStorage.removeItem('user')
+        window.location.href = '/'
+    }
+    const userData = localStorage.getItem('user')
+    if (!userData) {
+        return
+    }
+    if (userData === 'undefined' || userData === 'null') {
+        removeAndRedirect()
+        return
+    }
+    const { expirationTime } = JSON.parse(userData)
+    if (!expirationTime) {
+        removeAndRedirect()
+        return
+    }
+
+    if (new Date(expirationTime).toISOString() < new Date().toISOString()) {
+        removeAndRedirect()
+    }
+}

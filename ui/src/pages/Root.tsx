@@ -21,7 +21,7 @@ import { AuthContext } from '../context/AuthContext'
 import { useContext } from 'react'
 
 const Root = () => {
-    const { data, isLoading } = useQuery({
+    const { data, isLoading, isError } = useQuery({
         queryKey: ['posts'],
         queryFn: getAllPostsWithUsers,
     })
@@ -69,14 +69,15 @@ const Root = () => {
                                     <Skeleton height={250} />
                                     <Skeleton height={250} />
                                 </Stack>
-                            ) : data.length === 0 ? (
+                            ) : data?.length === 0 || isError ? (
                                 <Paper withBorder p='lg'>
                                     <Text
                                         align='center'
                                         size='xl'
                                         color='dimmed'
                                     >
-                                        No posts yet, but there will be soon!
+                                        Looks like we have nothing to show just
+                                        yet 😔
                                     </Text>
                                 </Paper>
                             ) : (

@@ -14,7 +14,6 @@ func SetupRouter(app *fiber.App) {
 	postController := &controllers.PostController{}
 	authController := &controllers.AuthController{}
 	api := app.Group("/api/v1")
-	api.Get("/users", userController.AllUsers)
 	dir, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
@@ -24,6 +23,10 @@ func SetupRouter(app *fiber.App) {
 	})
 	api.Post("/auth/register", authController.Register)
 	api.Post("/auth/login", authController.Login)
+
+	api.Get("/users", userController.AllUsers)
+	api.Get("/users/:id/settings", userController.GetSettings)
+	api.Put("/users/:id/settings", userController.UpdateSettings)
 
 	// api.Get("/posts", middleware.Protected, postController.AllPosts) - example of protected route
 

@@ -4,20 +4,35 @@ const apiUrl = import.meta.env.VITE_API_URL || null
 if (!apiUrl) throw new Error('API URL not set')
 
 export const getAllPosts = async () => {
-    const req = await fetch(`${apiUrl}/posts`)
+    const req = await fetch(`${apiUrl}/posts`, {
+        headers: {
+            withCredentials: 'true',
+        },
+        credentials: 'include',
+    })
     const res = await req.json()
     return res.posts
 }
 
 export const getAllPostsWithUsers = async () => {
-    const req = await fetch(`${apiUrl}/posts?includeUsers=true`)
+    const req = await fetch(`${apiUrl}/posts?includeUsers=true`, {
+        headers: {
+            withCredentials: 'true',
+        },
+        credentials: 'include',
+    })
     const res = await req.json()
     return res.posts
 }
 
 export const getPost = async (slug: string) => {
     const sanitizedSlug = slug.replace(/[^a-zA-Z0-9-_]/g, '').trim()
-    const req = await fetch(`${apiUrl}/posts/slug/${sanitizedSlug}`)
+    const req = await fetch(`${apiUrl}/posts/slug/${sanitizedSlug}`, {
+        headers: {
+            withCredentials: 'true',
+        },
+        credentials: 'include',
+    })
     const res = await req.json()
     return res.post
 }
@@ -33,8 +48,10 @@ export const doLogin = async ({
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            withCredentials: 'true',
         },
         body: JSON.stringify({ email, password }),
+        credentials: 'include',
     })
     const res = await req.json()
     return res
@@ -57,6 +74,7 @@ export const doRegister = async ({
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            withCredentials: 'true',
         },
         body: JSON.stringify({
             email,
@@ -65,6 +83,7 @@ export const doRegister = async ({
             firstName,
             lastName,
         }),
+        credentials: 'include',
     })
     if (!req.ok) {
         const { message, data } = await req.json()
@@ -98,10 +117,64 @@ export const createPost = async ({
     const req = await fetch(`${apiUrl}/posts`, {
         method: 'POST',
         body: formData,
+        headers: {
+            withCredentials: 'true',
+        },
+        credentials: 'include',
     })
     if (req.status === 413) {
         throw new Error()
     }
     const res = await req.json()
     return res
+}
+
+export const getSettings = async ({
+    userId,
+}: {
+    userId: number | undefined
+}): Promise<Settings> => {
+    if (!userId) throw new Error('No user id')
+    const req = await fetch(`${apiUrl}/users/${userId}/settings`, {
+        headers: {
+            withCredentials: 'true',
+        },
+        credentials: 'include',
+    })
+    const res = await req.json()
+    const settingsFieldTypes = {
+        id: 0,
+        createdAt: '',
+        updatedAt: '',
+        deletedAt: '',
+        userId: 0,
+        displayEmail: false,
+        websiteUrl: '',
+        location: '',
+        bio: '',
+        currentlyHackingOn: '',
+        availableFor: '',
+        currentlyLearning: '',
+        skillsLangs: '',
+        pronouns: '',
+        education: '',
+        work: '',
+        favoriteColor: '',
+    }
+
+    const settings = res.settings as Settings
+    const result = Object.fromEntries(
+        Object.entries(settings).map(([key, value]) => {
+            if (value === null) {
+                return [
+                    key,
+                    settingsFieldTypes[key as keyof typeof settingsFieldTypes],
+                ]
+            } else {
+                return [key, value]
+            }
+        })
+    ) as Settings
+
+    return result
 }

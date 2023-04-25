@@ -22,3 +22,23 @@ interface User {
     userId: number
     Posts?: Post[]
 }
+
+interface Settings {
+    id: number
+    createdAt: string
+    userId: number
+    deletedAt: string
+    updatedAt: string
+    displayEmail: boolean
+    websiteUrl: string
+    location: string
+    bio: string
+    currentlyHackingOn: string
+    availableFor: string
+    currentlyLearning: string
+    skillsLangs: string
+    pronouns: string
+    education: string
+    work: string
+    favoriteColor: string
+}
